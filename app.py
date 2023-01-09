@@ -12,11 +12,19 @@ app.config.from_envvar("APP_SETTINGS", silent=True)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True)
     password = db.Column(db.String(128))
+
+with app.app_context():
+    db.create_all()
+    # user = User(username="test_1", password="password")
+    #
+    # with db.session.begin():
+    #     db.session.add(user)
+    #     db.session.commit()
 
 
 @app.route("/")
@@ -46,3 +54,7 @@ def register():
         return jsonify({"error": "already_exists"}), 400
 
     return jsonify({"username": user.username}), 200
+
+if __name__ == '__main__':
+    app.run(host="localhost", port=10001, debug=True)
+
